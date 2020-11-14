@@ -14,6 +14,37 @@ const firebaseConfig = {
   appId: "1:151163916420:web:c5d2bf06e288697e87f2d1",
   measurementId: "G-502E0N6HRG"
 };
+
+export const createUserProfileDocument = async (userAuth, additionalData) => {
+   if(!userAuth) return
+   
+   const userRef = firestore.doc(`users/${userAuth.uid}`)
+
+   const snapShot = await userRef.get();
+
+   if(!snapShot.exists) {
+     // for CURD we use docRef, snapShot just gets the details
+     const { displayName, email} = userAuth;
+     const createdAt = new Date();
+
+    try {
+      await userRef.set({
+        displayName,
+        email,
+        createdAt,
+        ...additionalData
+      })
+    } catch(e) {
+      console.log('Error creating Data',e);
+    }
+   }
+   return userRef;
+}
+
+
+
+
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 firebase.analytics();
